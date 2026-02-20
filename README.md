@@ -1,1 +1,1 @@
-# CSCU 611 Repository
+# CSCI 611 Repository
