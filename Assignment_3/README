@@ -1,0 +1,169 @@
+# Small Object Detection Using YOLO
+
+CSCI 611 – Assignment 3  
+Olivia Johnson
+
+## Project Overview
+
+This project implements small object detection using the YOLOv8 object detection framework. The goal is to detect traffic signs from road images and video sequences. Because traffic signs are often small and distant, additional training and parameter tuning were performed to improve detection performance.
+
+The project evaluates:
+
+1. A pretrained YOLOv8 model
+2. A fine-tuned YOLOv8 model trained at image resolution 640
+3. A fine-tuned YOLOv8 model trained at image resolution 1280
+
+The results show that increasing image resolution significantly improves detection performance for small traffic signs.
+
+---
+
+## Dataset
+
+The dataset used in this project is the **Mapillary Traffic Sign Dataset (MTSD)**.
+
+Original dataset link:  
+https://www.mapillary.com/dataset/trafficsign
+
+A subset of the dataset was used and converted into YOLO format.
+
+Dataset split:
+
+- Training images: 9933
+- Validation images: 1241
+- Test images: 1243
+
+Annotations were converted from JSON format to YOLO format:
+
+```
+<class_id> <x_center> <y_center> <width> <height>
+```
+
+---
+
+## Project Structure
+
+```
+Assignment_3/
+
+dataset/
+  images/
+    train/
+    val/
+    test/
+  labels/
+    train/
+    val/
+    test/
+
+runs/
+  detect/
+    mtsd_640/
+    mtsd_1280/
+
+report_images/
+
+assignment3.ipynb
+dataset.yaml
+report.pdf
+README.md
+```
+
+---
+
+## Environment Setup
+
+Install dependencies:
+
+```bash
+pip install ultralytics opencv-python numpy torch torchvision torchaudio
+```
+
+---
+## You will also need to install the data sets yourself as they are too large to include here. You can use the convert_to_yolo file to convert the json to the correct format for YOLO.
+
+## Running YOLO Detection
+
+Example usage:
+
+```python
+from ultralytics import YOLO
+
+model = YOLO("yolov8n.pt")
+results = model("sample_image.jpg")
+results.show()
+```
+
+---
+
+## Training the Model
+
+Example training command:
+
+```python
+from ultralytics import YOLO
+
+model = YOLO("yolov8n.pt")
+
+model.train(
+    data="dataset.yaml",
+    epochs=30,
+    imgsz=640,
+    batch=16
+)
+```
+
+Another experiment was performed using higher resolution to improve detection of small objects:
+
+```python
+model.train(
+    data="dataset.yaml",
+    epochs=30,
+    imgsz=1280,
+    batch=8
+)
+```
+
+---
+
+## Detection on Video
+
+Example:
+
+```python
+model("traffic.mov", conf=0.5, save=True)
+```
+
+Frames were extracted from the resulting detection video for analysis.
+
+---
+
+## Results
+
+Performance comparison:
+
+| Model | mAP50 | mAP50-95 | Precision | Recall |
+|------|------|------|------|------|
+| Pretrained YOLOv8n | 0.010 | 0.006 | 0.017 | 0.071 |
+| YOLOv8n (640) | 0.272 | 0.188 | 0.428 | 0.289 |
+| YOLOv8n (1280) | 0.510 | 0.383 | 0.596 | 0.487 |
+
+Increasing image resolution significantly improved detection of small traffic signs.
+
+---
+
+## Files Included
+
+This repository contains:
+
+- Source code and notebooks
+- Dataset subset used for training
+- Trained YOLO model files
+- Detection screenshots
+- Video frame examples
+- Final report (PDF)
+
+---
+
+## Conclusion
+
+Fine-tuning YOLO on a traffic sign dataset significantly improves small object detection performance. Increasing image resolution from 640 to 1280 provided the best results for detecting small distant traffic signs.
